@@ -73,6 +73,13 @@ export class OpenAPIParser {
   }
 
   preprocess(spec: OpenAPISpec) {
+    // Automatically inject Changelog if it exists
+    if (spec.info && spec['x-changelog'] && spec['x-changelog'].markdown) {
+      const description = spec.info.description || '';
+      const changelog = new MarkdownRenderer().renderMd(spec['x-changelog'].markdown);
+      spec.info.description = appendToMdHeading(description, 'Changelog', changelog);
+    }
+
     if (
       !this.options.noAutoAuth &&
       spec.info &&
